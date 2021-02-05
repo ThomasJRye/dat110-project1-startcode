@@ -9,7 +9,15 @@ public class Message {
 	private byte[] payload;
 
 	public Message(byte[] payload) {
-		this.payload = payload; // TODO: check for length within boundary
+		if (payload.length > 127) {
+			byte[] fixedPayload = new byte[127]; // New array which will have correct length
+			for (int i = 0; i<127; i++) {
+				fixedPayload[i] = payload[i];
+			}
+			this.payload = fixedPayload;
+		} else {
+			this.payload = payload;
+		}
 	}
 
 	public Message() {
@@ -22,26 +30,24 @@ public class Message {
 
 	public byte[] encapsulate() {
 		
-		byte[] encoded = null;
-		
-		// TODO
-		// encapulate/encode the payload of this message in the
-		// encoded byte array according to message format
-		
-		if (true)
-		   throw new UnsupportedOperationException(TODO.method());
+		int length = getData().length;
+		byte[] encoded = new byte[128];
+		encoded[0] = (byte) length;
+
+		for (int i = 0; i< length; i++) {
+			encoded[i+1] = getData()[i];
+		}
 
 		return encoded;
 		
 	}
 
 	public void decapsulate(byte[] received) {
-
-		// TODO
-		// decapsulate the data contained in the received byte array and store it 
-		// in the payload of this message
-		
-		throw new UnsupportedOperationException(TODO.method());
+		int length = received[0];
+		this.payload = new byte[length];
+		for (int i = 1; i<length+1; i++) {
+			this.payload[i-1] = received[i];
+		}
 		
 	}
 }
